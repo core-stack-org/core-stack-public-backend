@@ -20,3 +20,4 @@ dependencies:
       - django
       - djangorestframework
       - django-cors-headers
+      - python-dotenv        # ← move here, not conda

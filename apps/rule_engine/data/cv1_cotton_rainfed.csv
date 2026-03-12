@@ -1,0 +1,24 @@
+Advisory Input Fields,Location (district_name),MVP PILOT LOCATION 02: AMRAVATI DISTRICT (MAHARASHTRA),,,,,,
+,Crop (code_name_type),CV1 Cotton Rainfed,,,,,,
+,Indicative Month of Sowing,June,,,,,,
+,Date of Sowing (DOS),(dd/mm/yyyy),,,,,,
+,"Days After Sowing (DAS)
+(t-n < t0 < t+n)",Critical Stage,No Rainfall (t+x),Light Rainfall (t+x),Moderate Rainfall (t+x),Heavy Rainfall (t+x),Active Advisory ,Risk Level
+Advisory Matrix ,t-n ,Pre Sowing (Pre Monsoon),Deep summer plowing to sanitize soil and kill pests.,Prepare for sowing; track Mrug Nakshatra showers for soil conditioning,"Delay harrowing, soil will be sticky to work","Stop/Delay soil preparation, high risk of soil structure damage",FALSE,Moderate
+,t=0 ,Sowing Day (Onset),Delay sowing as seedling might burn; until 75-100mm cumulative rain is reached.,"Risk of poor stands; check ""Monsoon Continuity and if 75-100mm threshold met""",Ideal for establishment if reaching 75-100mm threshold.,Stop sowing: High risk of soil compaction,TRUE,Critical
+,t+1 ,Growth/Germination,"Action: Monitor for ""Seedling Burn"" if soil heat is high.","Action: Monitor for ""Seedling Burn"" if soil heat is high.",Action: Risk: Soil crusting. Monitor for emergence.,"Action: Severe Risk: Seedling Rot or ""Mud Trap"" asphyxiation.",TRUE,Critical
+,t+1 to t+10,Growth/Germination,-,-,-,-,-,Critical
+,t+11 ,,,,,,,
+,t+10 to t+20,Seeding/Early Vegetative (t+15 onwards),Pest Monitoring for thrips/aphids; growth slows.,Ideal for root development,Manage drainage to prevent Seedling Rot ,Risk due to stagnant water causing yellowing/root rot,TRUE,Critical
+,t+20 to t+30,-,-,-,-,-,-,-
+,t+31,,,,,,,
+,t+30 to t+40,-,-,-,-,-,-,-
+,t+40 to t+50,Squaring/Branching (Flowing buds),"Critical: Use stored water for ""life-saving"" irrigation to prevent Square Drop.",Ideal for Flower bud moisture.,Manage jassids (sucking Pest)/Flies,Prevent Square Drop risk causing physical damage to buds,TRUE,Critical
+,t+50 to t+60,Squaring/Branching (Flowing buds),-,-,-,-,-,-
+,t+60 to t+70,Peak Flowering/Reproductive Stage,Risk: Reduced boll size. Use irrigation if available.,Peak water requirement met,Beneficial for boll size moisture.,Shedding risk: Physical flower loss. Drain field.,TRUE,Critical
+,t+70 to t+80,Peak Flowering/Reproductive Stage,-,-,-,-,-,-
+,t+80 to t+90,Peak Flowering/Reproductive Stage,-,-,-,-,-,-
+,t+90 to t+100,Boll Development (t+95 onwards),Beneficial for dry ripening.,Late rains can improve boll weight.,Risk of Internal Boll Rot. Monitor pink bollworm,"Risk: Heavy storms cause ""Boll Rot."" and fungal infections",FALSE,Moderate
+,t+100 to t+110,Boll Development,-,-,-,-,-,-
+,t+110 to t+150,Boll Opening ,Ideal: Bright sunshine needed for lint drying.,Risk: Fibre staining; lint may turn yellow/black.,Sooty Mold. Drastic market price drop.,Total Loss. Fiber degrades; pods rot.,TRUE,Moderate
+,t+n,Harvest,Ideal for picking and logistics.,Risk: Lowers the grade and price of cotton lint.,Storage risk for saturated lint,Discoloured lint rejection at mandis.,FALSE,Low

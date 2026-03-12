@@ -7,13 +7,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-CSV_PATH = os.path.join(
-    settings.BASE_DIR,
-    "apps",
-    "rule_engine",
-    "data",
-    "advisory_rules.csv"
-)
 
 #? MARK: Helpers
 def parse_das_range(text):
@@ -31,12 +24,9 @@ def parse_das_range(text):
 
     return None
 
-def safe_value(row, column):
-    val = row[column]
 
-    # if duplicate columns return a Series, take first value
-    if isinstance(val, pd.Series):
-        val = val.iloc[0]
+def safe_value(row, column_index):
+    val = row.iloc[column_index]
 
     if pd.isna(val):
         return None
@@ -45,12 +35,18 @@ def safe_value(row, column):
 
 
 #* MARK: API Endpoints
-@api_view(["GET"])
+@api_view(["POST"])
 def crop_rule_engine(request):
 
     try:
         crop = request.GET.get("crop")
         sowing_date = request.GET.get("sowing_date")
+
+        if not crop:
+            return Response(
+                {"error": "crop parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         sowing_date = datetime.strptime(sowing_date, "%Y-%m-%d").date()
         today = datetime.utcnow().date()
@@ -60,17 +56,31 @@ def crop_rule_engine(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Load CSV
-    df = pd.read_csv(CSV_PATH)
+    # Build CSV path dynamically from crop name
+    csv_path = os.path.join(
+        settings.BASE_DIR,
+        "apps",
+        "rule_engine",
+        "data",
+        f"{crop}.csv"
+    )
 
-    # Fix header row
-    header = df.iloc[4]
-    df = df[5:]
-    df.columns = header
+    if not os.path.exists(csv_path):
+        return Response(
+            {"error": f"Rules file not found for crop: {crop}"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Load CSV
+    df = pd.read_csv(csv_path)
+
+    # remove metadata rows
+    df = df.iloc[4:].reset_index(drop=True)
+
 
     for _, row in df.iterrows():
 
-        das_text = row["Days After Sowing (DAS)\n(t-n < t0 < t+n)"]
+        das_text = row.iloc[1]
 
         rng = parse_das_range(das_text)
 
@@ -86,13 +96,13 @@ def crop_rule_engine(request):
                 "days_after_sowing": days_after_sowing,
                 "matched_block": das_text,
                 "advisory": {
-                    "no_rainfall": safe_value(row, "No Rainfall (t+x)"),
-                    "light_rainfall": safe_value(row, "Light Rainfall (t+x)"),
-                    "moderate_rainfall": safe_value(row, "Moderate Rainfall (t+x)"),
-                    "heavy_rainfall": safe_value(row, "Heavy Rainfall (t+x)"),
-                    "risk_level": safe_value(row, "Risk Level")
+                    "no_rainfall": safe_value(row, 3),
+                    "light_rainfall": safe_value(row, 4),
+                    "moderate_rainfall": safe_value(row, 5),
+                    "heavy_rainfall": safe_value(row, 6),
+                    "risk_level": safe_value(row, 9)
+
                 }
             })
 
     return Response({"message": "No advisory block found"}, status=404)
-
