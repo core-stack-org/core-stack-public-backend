@@ -1,0 +1,22 @@
+name: corestack-env
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python>=3.11
+  - numpy
+  - pandas
+  - xarray
+  - zarr
+  - fsspec
+  - pip
+  - s3fs
+  - pytz
+  - boto3
+  - requests
+  - pip:
+      - django
+      - djangorestframework
+      - django-cors-headers
