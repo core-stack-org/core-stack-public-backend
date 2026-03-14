@@ -148,6 +148,18 @@ def crop_rule_engine(request):
             transition_stage = block.get("transition_stage") or None
             transition_advisory = rule.get("transition_advisory") or None
 
+            # MARK: Next Block Advisories
+            next_block_advisories = None
+
+            if block_index + 1 < len(crop_rules):
+                next_block = crop_rules[block_index + 1]
+                next_rainfall_rules = next_block["patterns"].get("rainfall", [])
+
+                next_block_advisories = {
+                    r.get("pt_type"): r.get("advisory")
+                    for r in next_rainfall_rules
+                }
+
             return Response({
                 "state": state,
                 "district": district,
@@ -167,6 +179,8 @@ def crop_rule_engine(request):
                     "name": transition_stage,
                     "transition_advisory": transition_advisory,
                 } if transition_stage else None,
+
+                "next_block_advisories": next_block_advisories,
 
                 "rainfall_next_10_days_mm": round(total_precip_10_days, 4),
                 "pattern_type": rule.get("pt_type"),
