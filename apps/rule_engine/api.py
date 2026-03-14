@@ -178,9 +178,9 @@ def crop_rule_engine(request):
                 "transition_stage": {
                     "name": transition_stage,
                     "transition_advisory": transition_advisory,
-                } if transition_stage else None,
+                } if (transition_stage and transition_advisory) else None,
 
-                "next_block_advisories": next_block_advisories,
+                "next_block_advisories": next_block_advisories if not (transition_stage and transition_advisory) else None,
 
                 "rainfall_next_10_days_mm": round(total_precip_10_days, 4),
                 "pattern_type": rule.get("pt_type"),
