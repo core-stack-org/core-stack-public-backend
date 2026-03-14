@@ -1,0 +1,481 @@
+{
+  "sehore": {
+    "soybean": {
+      "time_blocks": [
+        {
+          "start_das": 1,
+          "end_das": 10,
+          "transition_stage" : "Germination Onset",
+          "active_stage": "Growth & Germinantion",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "between",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "Observe: Heat may bake top layer. High risk of seedling mortality if moisture drops.",
+                "advisory": "Warning: Soil is drying. If sprouts don't appear by Day 7, prepare for a light sprinkler spray."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "between",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "Observe: Light rain cools the soil. Monitor for steady sprout emergence.",
+                "advisory": "Observe: Watch the soil surface to check whether heat baked the top layer or soil, and if the light rain can cool the soil  sprouts."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "between",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "Observe: Monitor emergence. Ideal moisture for uniform stand.",
+                "advisory": "Preparation: Weeds (like Sanwa) will emerge soon. Get your 'Dora' (inter-culture tool) or herbicides ready.Check for risk of crusting."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "between",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "Alert: Severe Crusting (Papdi). Seedlings trapped under soil, black soil might lock, prepare to break if required.",
+                "advisory": "Alert: Severe Crusting (Papdi). Seedlings trapped under soil, black soil might lock, prepare to break if required."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 11,
+          "end_das": 20,
+          "transition_stage" : "Prep for Branching",
+          "active_stage": "Early Vegetative/Branching",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "Warning: 'Hardening of crop' phase. Let the roots go deep into the Black soil. Do not irrigate yet",
+                "advisory": "Action: 'Hardening of crop' phase. Hardening phase. Use  intercultural tools 'Dora' to break capillaries and save deep moisture"
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "Preparation: Plan for hoeing to conserve the limited moisture available in soil.",
+                "advisory": "Status: Growth is steady/ideal. Use 'Dora' to save moisture and manage early weeds."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "Prepare: Growth is steady. Complete weeding before crop branches out.",
+                "advisory": "Observe: Ideal for steady growth. Check and manage for weed/pest issues"
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "Alert: High root rot risk. Standing water for 48 hours is fatal. Check drains.",
+                "advisory": "Urgent Action: Waterlogging risk is high. Soybean cannot stand in water for 48 hours. Drain immediately."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 20,
+          "end_das": 30,
+          "transition_stage" : "",
+          "active_stage": "Early Vegetative/Branching",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: 'Hardening of crop' phase. Hardening phase. Use  intercultural tools 'Dora' to break capillaries and save deep moisture"
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Status: Growth is steady/ideal. Use 'Dora' to save moisture and manage early weeds."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal for steady growth. Check and manage for weed/pest issues"
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Urgent Action: Waterlogging risk is high. Soybean cannot stand in water for 48 hours. Drain immediately."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 31,
+          "end_das": 40,
+          "transition_stage" : "Prep for Flowering",
+          "active_stage": "Flowering",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "Warning: Drought stress risk next week might cause flower drop. Prepare pumps for 1st Irrigation.",
+                "advisory": "Action: Only if required, apply Urea post-rain. Moisture needed to absorb branching nutrients."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "Prepare: Monitor pest outbreaks.",
+                "advisory": "Action: Only if required, apply Urea top-dressing while soil is damp for better uptake."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "Prepare: Humidity rising. Buy Girdle Beetle sprays before canopy closes.",
+                "advisory": "Action: Only if required, apply Urea after rainfall. Ideal window for maximum nutrient uptake."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "Alert: Flowering starts next week. Perfect drainage is required to save yield.",
+                "advisory": "Warning: High Leaching Risk. Postpone chemicals. Manage runoff to save nutrients."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 40,
+          "end_das": 50,
+          "transition_stage" : "",
+          "active_stage": "Flowering",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Perform 1st Life-Saving Irrigation. High shedding risk. Apply water to save pods."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Action: Beneficial moisture. Monitor for early pests. Ideal for pod growth."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal for flowering. Conduct intensive pest surveillance (Aphids). Potential for minor drop. Virus control check."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning/Action: Severe Flower Drop. Stagnant water is toxic. Drain field within 24 hrs."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 50,
+          "end_das": 60,
+          "transition_stage" : "",
+          "active_stage": "Pod Development",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Perform 2nd Life-Saving Irrigation. Plants need water to push nutrients to pods."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal condition for growth. Watch for Girdle Beetle activity."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Observe: Watch for Girdle Beetle. Potential pest outbreak due to high humidity."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Potential pest outbreak due to high humidity risk. Pod drop risk. Keep water exit points clear."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 60,
+          "end_das": 70,
+          "transition_stage" : "",
+          "active_stage": "Pod Development",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: If dry, pods will be flat. Apply moisture to ensure filling."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal filling. Use last moisture to ensure bold grains."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal filling. Monitor for late-stage pests."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Drainage! Standing water causes 'Grain Darkening.'"
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 70,
+          "end_das": 80,
+          "transition_stage" : "",
+          "active_stage": "Seed Filling Stage",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Perform 3rd Life-Saving Irrigation. Ensure maximum grain weight and market price."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal for bold grain. Ensure no pests are eating pods."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal for bold grain. Monitor for diseases due to moisture. Potential Risk of nutrient washout."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Nutrient leaching is high. Excess water lowers oil content. High runoff risk, drain fast!"
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 80,
+          "end_das": 90,
+          "transition_stage" : "",
+          "active_stage": "Seed Filling Stage",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Final moisture check. If soil is cracking, provide one last light irrigation."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Beneficial moisture. Monitor for pests."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal completion. Monitor for pod-shattering."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: High Risk. Standing water causes pods to rot and seeds to sprout."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 90,
+          "end_das": 100,
+          "transition_stage" : "",
+          "active_stage": "Maturity/Harvest",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal for Drying. Harvest immediately. Dry in sun for 2-3 days."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Action: Delay harvest if pods are damp. Wait for 1 sunny day."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: High pod shattering risk. Harvest with extreme care."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk of Total Loss and Sprouting Fungal Rot. Cover heaps immediately."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 100,
+          "end_das": 99999,
+          "transition_stage" : "",
+          "active_stage": "Maturity/Harvest",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Harvesting should be 50% done. Move grain to dry storage."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Action: Protect harvested stacks. Keep grain under cover for color."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: Wet soil staining risk. Wait for field to dry before cutting."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Stop All Harvest. Standing water destroys quality."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

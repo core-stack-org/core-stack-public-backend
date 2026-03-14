@@ -1,0 +1,567 @@
+{
+  "amravati": {
+    "cotton": {
+      "time_blocks": [
+        {
+          "start_das": 1,
+          "end_das": 10,
+          "transition_stage" : "Germination Onset",
+          "active_stage": "Growth & Germinantion",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "between",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "Action: Monitor for 'Seedling Burn' if soil heat is high. Protect seed moisture and prepare for manual watering if no sprouts till Day 8.",
+                "advisory": "Action: Risk of Heat Stress. If no emergence by Day 7, check for 'cooked' seeds below surface."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "between",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "Action: Monitor for 'Seedling Burn' if soil heat is high. Check misture at root depth and if rain can cool soil. Watch for top-layer baking.",
+                "advisory": "Action: Ideal Growth. Monitor for early sucking pests (Thrips) as leaves expand."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "between",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "Action: Monitor risk due to Soil crusting. Monitor for emergence, prepare for weed management.",
+                "advisory": "Action: Risk due to Crust Barrier. If soil dries fast, the 'looper' (hypocotyl) may snap. Break crust."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "between",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "Action: Severe Risk due to Seedling Rot or 'Mud Trap' asphyxiation. Drain stagnant water immediately.",
+                "advisory": "Action: Begin Damping Off. Fungal risk is high. Seedlings may wilt and die at base."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 11,
+          "end_das": 20,
+          "transition_stage" : "Prep for Early Veg",
+          "active_stage": "Seeding/Early Vegetative ",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "Warning: Growth might reduce. Identify gaps in field for immediate Gap Filling.",
+                "advisory": "Action: Pest Monitoring for thrips/aphids; growth might reduce due to dry soil."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "Preparation: Prepare for Sucking pests (Thrips) appearing. Buy your first bio-sprays.",
+                "advisory": "Observe: Ideal for root development, let taproots go deep into clay."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "Preparation: Prepare fertiliser doses needed next week. ",
+                "advisory": "Action: Manage drainage to prevent Seedling Rot as growth accelerates."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "Warning: Risk of Disease 'Lalya' (Reddening) starts if water stands. Clear deep drainage.",
+                "advisory": "Warning: Risk due to stagnant water causing yellowing/root rot"
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 20,
+          "end_das": 30,
+          "transition_stage" : "",
+          "active_stage": "Seeding/Early Vegetative ",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Observe: Pest increase in dry heat. Check leaf undersides."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Ideal condition for roots to go deep. Best time for healthy growth."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Action: Perform Drainage and keep water moving to prevent root rot."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Waterlogging risk can roots turn leaves red (Lalya). Clear drains."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 31,
+          "end_das": 40,
+          "transition_stage" : "",
+          "active_stage": "Prep for Squaring",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Observe: Monitor for sucking pest surge, and leaf curling. Fertilize is soil has residual mositure."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Preparation: Prepare plant for reproductive switch. Nutrient uptake is at peak, ideal time for branching and growth."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Monitor for sucking pests which attack tiny squares. Start weed management."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Avoid fertilizing now due to risk of wastage by rainwater wash."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 40,
+          "end_das": 50,
+          "transition_stage" : "",
+          "active_stage": "Squaring/Branching (Flowing buds)",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Critical: Use stored water for 'life-saving' irrigation to prevent Square Drop."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Optimal condition as moisture helps the plant hold onto its flower buds."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Manage jassids (sucking Pest)/Flies"
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Prevent Square Drop risk causing physical damage to buds"
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 50,
+          "end_das": 60,
+          "transition_stage" : "",
+          "active_stage": "Squaring/Branching (Flowing buds)",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Observe: Monitor for leaf curling. Sucking pest surge is likely."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Ideal condition to support flower bud moisture and square retention."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Action: Monitor and spray to manage pests and flies before they ruin buds"
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Fungal leaf spot risk. Clear deep drainage channels."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 60,
+          "end_das": 70,
+          "transition_stage" : "",
+          "active_stage": "Reproductive Stage",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Risk: Reduced boll size. Use irrigation if available."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Peak water requirement met"
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Beneficial for boll size moisture."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Shedding risk: Physical flower loss. Drain field."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 70,
+          "end_das": 80,
+          "transition_stage" : "",
+          "active_stage": "Peak Flowering",
+          "risk_level": "Critical",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Apply Potassium if soil is dry to help bolls grow."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Ideal condition to meet the plant's highest water demand."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Beneficial for boll size and moisture retention."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk of Flower loss. Drain field to protect root oxygen."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 80,
+          "end_das": 90,
+          "transition_stage" : "",
+          "active_stage": "Early Boll Development",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Observe: Quality Risk as bolls may open too early and be short-fiber."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Helpful as rain adds weight and size to developing bolls."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Observe: Monitor bolls for rot or worm holes"
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk of boll rot and branch breakage. "
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 90,
+          "end_das": 100,
+          "transition_stage" : "",
+          "active_stage": "Boll Development",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Beneficial for dry ripening of bolls and helps fiber set."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "A Late rains can improve boll weight of top bolls"
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk of Internal Boll Rot. Monitor pink bollworm."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Risk: Heavy storms cause 'Boll Rot' and fungal infections"
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 100,
+          "end_das": 110,
+          "transition_stage" : "",
+          "active_stage": "Boll Development",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Ideal as Dry weather prevents fungal onset. Ripening finishes."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Observe: Humidity may cause secondary pest flushes."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk: Internal Boll Rot. Monitor Pink Bollworm activity."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Pathogenic rot. Drain field to save remaining bolls."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 110,
+          "end_das": 150,
+          "transition_stage" : "",
+          "active_stage": "Boll Opening",
+          "risk_level": "Moderate",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal for picking as Bright sun is needed for lint drying and fluffy white cotton to be ready."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Action: Risk of Fibre staining; lint may turn yellow/black, avoid picking damp cotton."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: High risk of sooty mold and drastic market price drop at mandis."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Total Loss. Fiber degrades; pods rot. Pick open bolls now."
+              }
+            ]
+          }
+        },
+        {
+          "start_das": 150,
+          "end_das": 9999,
+          "transition_stage" : "",
+          "active_stage": "Harvest",
+          "risk_level": "Low",
+          "patterns": {
+            "rainfall": [
+              {
+                "pt_type": "No_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 0,
+                "transition_advisory" : "",
+                "advisory": "Action: Ideal for picking and logistics."
+              },
+              {
+                "pt_type": "Light_rainfall",
+                "op_type": "1",
+                "low": 0,
+                "high": 15,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk as damp cotton lowers the grade and price of cotton lint. Dry it out first."
+              },
+              {
+                "pt_type": "Moderate_rainfall",
+                "op_type": "1",
+                "low": 15,
+                "high": 62,
+                "transition_advisory" : "",
+                "advisory": "Warning: Storage risk for saturated lint, and risk of drop in quality to due to mold/discolouration."
+              },
+              {
+                "pt_type": "Heavy_rainfall",
+                "op_type": "1",
+                "low": 64,
+                "high": 999999999,
+                "transition_advisory" : "",
+                "advisory": "Warning: Risk of Discoloured lint rejection at mandis."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
