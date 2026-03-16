@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-up@75nvx*s&r-y+96s(*ag%9)v9w$%zutycu_%ide2c%hl*^_6
 DEBUG = True
 
 #ALLOWED_HOSTS = ["172.17.0.1"]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # Local apps
     "weather",
     "beckn",
-    "rule_engine"
+    "rule_engine",
 ]
 
 MIDDLEWARE = [
@@ -133,5 +133,6 @@ STATIC_URL = 'static/'
 # MARK: Environment Variables
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
 X_API_KEY = os.getenv("X_API_KEY")
 GEOSERVER_URL = os.getenv("GEOSERVER_URL")
