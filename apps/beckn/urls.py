@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import DiscoverAPI, SelectAPI, InitAPI, ConfirmAPI
+
+from .api import DiscoverAPI, SelectAPI, InitAPI, ConfirmAPI
 
 urlpatterns = [
     path("discover", DiscoverAPI.as_view()),

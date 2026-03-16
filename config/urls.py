@@ -19,5 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path("api/v1/weather/", include("weather.urls")),
     path("api/v1/advisory/", include("rule_engine.urls")),
-    path("bpp/receiver/", include("beckn.urls")),
+    path("", include("beckn.urls")),
 ]

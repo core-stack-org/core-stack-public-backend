@@ -1,14 +1,16 @@
 import os
 import json
 import uuid
+import threading
 from datetime import datetime, timezone
+
+import requests
+import boto3
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
-
-import boto3
 
 from .models import Dataset, DatasetOrder
 from .services import generate_download_token
@@ -30,12 +32,17 @@ def load_json_template(filename: str) -> dict:
 
 def inject_dynamic_context(data: dict) -> dict:
     iso_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    guid = str(uuid.uuid4())
 
     data["context"]["timestamp"] = iso_timestamp
-    data["context"]["message_id"] = guid
 
     return data
+
+
+def fire_callback(url: str, payload: dict):
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        pass
 
 
 class DiscoverAPI(APIView):
@@ -59,9 +66,29 @@ class SelectAPI(APIView):
     permission_classes = []
 
     def post(self, request):
+        context = request.data.get("context", {})
+        bap_uri = context.get("bap_uri")
+        message_id = context.get("message_id")
+
         on_select = load_json_template("on_select.json")
         on_select = inject_dynamic_context(on_select)
-        return Response(on_select)
+        on_select["context"]["bap_uri"] = bap_uri
+        on_select["context"]["message_id"] = message_id
+
+        threading.Thread(
+            target=fire_callback,
+            args=(f"{settings.BPP_URI}/bpp/caller/on_select", on_select),
+            daemon=True
+        ).start()
+
+        return Response({
+            "context": context,
+            "message": {
+                "ack": {
+                    "status": "ACK"
+                }
+            }
+        })
 
 
 class InitAPI(APIView):
@@ -69,9 +96,29 @@ class InitAPI(APIView):
     permission_classes = []
 
     def post(self, request):
+        context = request.data.get("context", {})
+        bap_uri = context.get("bap_uri")
+        message_id = context.get("message_id")
+
         on_init = load_json_template("on_init.json")
         on_init = inject_dynamic_context(on_init)
-        return Response(on_init)
+        on_init["context"]["bap_uri"] = bap_uri
+        on_init["context"]["message_id"] = message_id
+
+        threading.Thread(
+            target=fire_callback,
+            args=(f"{settings.BPP_URI}/bpp/caller/on_init", on_init),
+            daemon=True
+        ).start()
+
+        return Response({
+            "context": context,
+            "message": {
+                "ack": {
+                    "status": "ACK"
+                }
+            }
+        })
 
 
 class ConfirmAPI(APIView):
@@ -79,13 +126,32 @@ class ConfirmAPI(APIView):
     permission_classes = []
 
     def post(self, request):
+        context = request.data.get("context", {})
+        bap_uri = context.get("bap_uri")
+        message_id = context.get("message_id")
 
         on_confirm = load_json_template("on_confirm.json")
         on_confirm = inject_dynamic_context(on_confirm)
+        on_confirm["context"]["bap_uri"] = bap_uri
+        on_confirm["context"]["message_id"] = message_id
 
         try:
-            access_url = on_confirm["message"]["order"]["beckn:fulfillment"]["beckn:deliveryAttributes"]["fulfillment:accessUrl"]
+            #* Call forecast download API
+            forecast_response = requests.get(
+                f"{settings.LOCAL_URL}/api/v1/weather/download_forecast/",
+                params={"lat": 28.62, "lon": 77.43},
+                timeout=30
+            )
+            forecast_data = forecast_response.json()
+            access_url = forecast_data.get("url")
 
+            if not access_url:
+                return Response(
+                    {"error": "Forecast API did not return a valid URL"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            #* Get file size from S3
             path = access_url.split(".amazonaws.com/")[1]
             s3_key = path.split("?")[0]
 
@@ -100,12 +166,27 @@ class ConfirmAPI(APIView):
             head = s3_client.head_object(Bucket=S3_BUCKET, Key=s3_key)
             file_size = head["ContentLength"]
 
+            #* Update on_confirm with new URL and file size
+            on_confirm["message"]["order"]["beckn:fulfillment"]["beckn:deliveryAttributes"]["fulfillment:accessUrl"] = access_url
             on_confirm["message"]["order"]["beckn:fulfillment"]["beckn:deliveryAttributes"]["fulfillment:fileSizeBytes"] = file_size
 
         except Exception as e:
             return Response(
-                {"error": f"Failed to fetch file size from S3: {str(e)}"},
+                {"error": f"Failed to process confirm: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return Response(on_confirm)
+        threading.Thread(
+            target=fire_callback,
+            args=(f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm),
+            daemon=True
+        ).start()
+
+        return Response({
+            "context": context,
+            "message": {
+                "ack": {
+                    "status": "ACK"
+                }
+            }
+        })
