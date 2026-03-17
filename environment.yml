@@ -21,3 +21,4 @@ dependencies:
       - djangorestframework
       - django-cors-headers
       - python-dotenv
+      - celery

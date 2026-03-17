@@ -1,6 +1,5 @@
 import os
 import json
-import uuid
 import threading
 from datetime import datetime, timezone
 
@@ -14,6 +13,7 @@ from django.conf import settings
 
 from .models import Dataset, DatasetOrder
 from .services import generate_download_token
+from .tasks import beckn_onix_call
 
 S3_BUCKET = "corestack-weather-data"
 TEMPLATES_DIR = os.path.join(
@@ -75,11 +75,7 @@ class SelectAPI(APIView):
         on_select["context"]["bap_uri"] = bap_uri
         on_select["context"]["message_id"] = message_id
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_select", on_select),
-            daemon=True
-        ).start()
+        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_select", on_select)
 
         return Response({
             "context": context,
@@ -105,11 +101,7 @@ class InitAPI(APIView):
         on_init["context"]["bap_uri"] = bap_uri
         on_init["context"]["message_id"] = message_id
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_init", on_init),
-            daemon=True
-        ).start()
+        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_init", on_init)
 
         return Response({
             "context": context,
@@ -176,11 +168,7 @@ class ConfirmAPI(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm),
-            daemon=True
-        ).start()
+        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm)
 
         return Response({
             "context": context,
