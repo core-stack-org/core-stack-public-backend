@@ -75,7 +75,10 @@ class SelectAPI(APIView):
         on_select["context"]["bap_uri"] = bap_uri
         on_select["context"]["message_id"] = message_id
 
-        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_select", on_select)
+        beckn_onix_call.apply_async(
+            args=[f"{settings.BPP_URI}/bpp/caller/on_select", on_select],
+            queue='beckn'
+        )
 
         return Response({
             "context": context,
@@ -101,7 +104,10 @@ class InitAPI(APIView):
         on_init["context"]["bap_uri"] = bap_uri
         on_init["context"]["message_id"] = message_id
 
-        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_init", on_init)
+        beckn_onix_call.apply_async(
+            args=[f"{settings.BPP_URI}/bpp/caller/on_init", on_init],
+            queue='beckn'
+        )
 
         return Response({
             "context": context,
@@ -168,8 +174,10 @@ class ConfirmAPI(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        beckn_onix_call.delay(f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm)
-
+        beckn_onix_call.apply_async(
+            args=[f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm],
+            queue='beckn'
+        )
         return Response({
             "context": context,
             "message": {
