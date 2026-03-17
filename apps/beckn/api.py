@@ -26,7 +26,7 @@ TEMPLATES_DIR = os.path.join(
 
 def load_json_template(filename: str) -> dict:
     filepath = os.path.join(TEMPLATES_DIR, filename)
-    with open(filepath) as f:
+    with open(filepath, encoding="utf-8") as f:
         return json.load(f)
 
 
