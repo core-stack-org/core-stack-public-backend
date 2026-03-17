@@ -22,3 +22,4 @@ dependencies:
       - django-cors-headers
       - python-dotenv
       - celery
+      - environ

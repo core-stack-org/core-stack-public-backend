@@ -75,6 +75,8 @@ class SelectAPI(APIView):
         on_select["context"]["bap_uri"] = bap_uri
         on_select["context"]["message_id"] = message_id
 
+        print("Reached here Before The Celery")
+
         beckn_onix_call.apply_async(
             args=[f"{settings.BPP_URI}/bpp/caller/on_select", on_select],
             queue='beckn'
