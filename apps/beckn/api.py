@@ -15,6 +15,8 @@ from .models import Dataset, DatasetOrder
 from .services import generate_download_token
 from .tasks import beckn_onix_call
 
+BPP_URI = "http://api.core-stack.org:8082/"
+LOCAL_URL = "https://api.core-stack.org/"
 S3_BUCKET = "corestack-weather-data"
 TEMPLATES_DIR = os.path.join(
     settings.BASE_DIR,
@@ -78,7 +80,7 @@ class SelectAPI(APIView):
         print("Reached here Before The Celery")
 
         beckn_onix_call.apply_async(
-            args=[f"{settings.BPP_URI}/bpp/caller/on_select", on_select],
+            args=[f"{BPP_URI}/bpp/caller/on_select", on_select],
             queue='beckn'
         )
 
@@ -107,7 +109,7 @@ class InitAPI(APIView):
         on_init["context"]["message_id"] = message_id
 
         beckn_onix_call.apply_async(
-            args=[f"{settings.BPP_URI}/bpp/caller/on_init", on_init],
+            args=[f"{BPP_URI}/bpp/caller/on_init", on_init],
             queue='beckn'
         )
 
@@ -138,7 +140,7 @@ class ConfirmAPI(APIView):
         try:
             #* Call forecast download API
             forecast_response = requests.get(
-                f"{settings.LOCAL_URL}/api/v1/weather/download_forecast/",
+                f"{LOCAL_URL}/api/v1/weather/download_forecast/",
                 params={"lat": 28.62, "lon": 77.43},
                 timeout=30
             )
@@ -177,7 +179,7 @@ class ConfirmAPI(APIView):
             )
 
         beckn_onix_call.apply_async(
-            args=[f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm],
+            args=[f"{BPP_URI}/bpp/caller/on_confirm", on_confirm],
             queue='beckn'
         )
         return Response({
