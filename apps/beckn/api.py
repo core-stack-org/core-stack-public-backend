@@ -16,7 +16,7 @@ from .services import generate_download_token
 from .tasks import beckn_onix_call
 
 BPP_URI = "http://api.core-stack.org:8082"
-LOCAL_URL = "https://api.core-stack.org"
+LOCAL_URL = "http://api.core-stack.org:8000"
 S3_BUCKET = "corestack-weather-data"
 TEMPLATES_DIR = os.path.join(
     settings.BASE_DIR,
