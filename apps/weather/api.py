@@ -3,6 +3,7 @@ import logging
 import requests
 from datetime import datetime, timedelta
 import time
+import uuid
 
 import numpy as np
 import pandas as pd
@@ -27,6 +28,39 @@ FORECAST_DAYS_LIMIT = 15
 HOURLY_FORECAST_HOURS = 120   # 5 days
 EXTENDED_FORECAST_HOURS = 360 # 15 days
 S3_BUCKET = "corestack-weather-data"
+S3_PRESIGNED_EXPIRY = 3600  # 1 hour
+
+# MARK: Helper - Upload to S3 and return presigned URL
+def upload_to_s3_and_get_url(data: dict) -> str:
+
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_REGION_NAME,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
+
+    file_key = f"crop_advisories/{uuid.uuid4()}.json"
+
+    s3_client.put_object(
+        Bucket=S3_BUCKET,
+        Key=file_key,
+        Body=json.dumps(data),
+        ContentType="application/json",
+    )
+
+    presigned_url = s3_client.generate_presigned_url(
+        "get_object",
+        Params={
+            "Bucket": S3_BUCKET,
+            "Key": file_key,
+        },
+        ExpiresIn=S3_PRESIGNED_EXPIRY,
+    )
+
+    return presigned_url
+
 
 
 def get_zarr_path(date: datetime) -> str:
@@ -786,3 +820,196 @@ def get_historic_forecast(request):
     }
 
     return Response(result, status=status.HTTP_200_OK)
+
+
+
+@api_view(["GET"])
+def get_forecast_download(request):
+    try:
+        lat = float(request.GET.get("lat"))
+        lon = float(request.GET.get("lon"))
+
+    except Exception as e:
+        return Response(
+            {"error": f"Invalid parameters: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not (MIN_LAT <= lat <= MAX_LAT and MIN_LON <= lon <= MAX_LON):
+        return Response(
+            {"error": "Coordinates outside India domain"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    zarr_path = resolve_zarr_path()
+    if not zarr_path:
+        return Response(
+            {"error": "Forecast data not available. Please try again later."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+
+    try:
+        ds = open_zarr(zarr_path)
+
+        point_ds = ds.sel(
+            latitude=lat,
+            longitude=lon,
+            method="nearest"
+        )
+
+        actual_lat = float(point_ds.latitude.values)
+        actual_lon = float(point_ds.longitude.values)
+        init_time = pd.Timestamp(point_ds.init_time.values)
+
+        # Start from midnight UTC of current day
+        today_midnight = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        start_offset_hours = int((today_midnight - init_time.to_pydatetime().replace(tzinfo=None)).total_seconds() / 3600)
+
+        # BLOCK 1: today_midnight to today_midnight+120h (hourly) → 3-hourly
+        hourly_lead_times = [
+            pd.Timedelta(hours=h)
+            for h in range(start_offset_hours, start_offset_hours + HOURLY_FORECAST_HOURS + 1)
+        ]
+        hourly_ds = point_ds.sel(
+            lead_time=hourly_lead_times,
+            method="nearest"
+        ).compute()
+
+        hourly_temp = hourly_ds["temperature_2m"].values
+        hourly_precip = hourly_ds["precipitation_surface"].values
+        hourly_u = hourly_ds["wind_u_10m"].values if "wind_u_10m" in hourly_ds else None
+        hourly_v = hourly_ds["wind_v_10m"].values if "wind_v_10m" in hourly_ds else None
+        hourly_lead = hourly_ds.lead_time.values
+
+        block1_times = []
+        block1_temp = []
+        block1_precip = []
+        block1_wind_speed = []
+        block1_wind_dir = []
+
+        for i in range(0, HOURLY_FORECAST_HOURS, 3):
+            window_temp = hourly_temp[i:i+3]
+            window_precip = hourly_precip[i:i+3]
+
+            block1_times.append((init_time + hourly_lead[i]).strftime("%Y-%m-%dT%H:%M"))
+
+            t_val = float(window_temp[0])
+            block1_temp.append(None if np.isnan(t_val) else round(t_val, 4))
+
+            p_vals = [float(v) * 3600 for v in window_precip if not np.isnan(v)]
+            block1_precip.append(round(sum(p_vals), 4) if p_vals else None)
+
+            if hourly_u is not None and hourly_v is not None:
+                window_u = hourly_u[i:i+3]
+                window_v = hourly_v[i:i+3]
+                speeds = [
+                    float(np.sqrt(u**2 + v**2))
+                    for u, v in zip(window_u, window_v)
+                    if not (np.isnan(u) or np.isnan(v))
+                ]
+                dirs = [
+                    float(np.degrees(np.arctan2(v, u)) % 360)
+                    for u, v in zip(window_u, window_v)
+                    if not (np.isnan(u) or np.isnan(v))
+                ]
+                block1_wind_speed.append(round(float(np.mean(speeds)), 4) if speeds else None)
+                block1_wind_dir.append(round(float(np.mean(dirs)), 4) if dirs else None)
+            else:
+                block1_wind_speed.append(None)
+                block1_wind_dir.append(None)
+
+        # BLOCK 2: today_midnight+123h to today_midnight+360h (already 3-hourly)
+        extended_lead_times = [
+            pd.Timedelta(hours=h)
+            for h in range(start_offset_hours + 123, start_offset_hours + EXTENDED_FORECAST_HOURS + 1, 3)
+        ]
+        extended_ds = point_ds.sel(
+            lead_time=extended_lead_times,
+            method="nearest"
+        ).compute()
+
+        ext_temp = extended_ds["temperature_2m"].values
+        ext_precip = extended_ds["precipitation_surface"].values
+        ext_u = extended_ds["wind_u_10m"].values if "wind_u_10m" in extended_ds else None
+        ext_v = extended_ds["wind_v_10m"].values if "wind_v_10m" in extended_ds else None
+        ext_lead = extended_ds.lead_time.values
+
+        block2_times = [
+            (init_time + lt).strftime("%Y-%m-%dT%H:%M") for lt in ext_lead
+        ]
+        block2_temp = [
+            None if np.isnan(float(v)) else round(float(v), 4) for v in ext_temp
+        ]
+        block2_precip = [
+            None if np.isnan(float(v)) else round(float(v) * 3600 * 3, 4) for v in ext_precip
+        ]
+
+        if ext_u is not None and ext_v is not None:
+            block2_wind_speed = [
+                None if (np.isnan(u) or np.isnan(v)) else round(float(np.sqrt(u**2 + v**2)), 4)
+                for u, v in zip(ext_u, ext_v)
+            ]
+            block2_wind_dir = [
+                None if (np.isnan(u) or np.isnan(v)) else round(float(np.degrees(np.arctan2(v, u)) % 360), 4)
+                for u, v in zip(ext_u, ext_v)
+            ]
+        else:
+            block2_wind_speed = [None] * len(block2_times)
+            block2_wind_dir = [None] * len(block2_times)
+
+        all_times = block1_times + block2_times
+        all_temp = block1_temp + block2_temp
+        all_precip = block1_precip + block2_precip
+        all_wind_speed = block1_wind_speed + block2_wind_speed
+        all_wind_dir = block1_wind_dir + block2_wind_dir
+
+        now_ts = pd.Timestamp(datetime.utcnow())
+        valid_timestamps = [pd.Timestamp(t) for t in all_times]
+        current_idx = int(np.argmin([abs((ts - now_ts).total_seconds()) for ts in valid_timestamps]))
+
+        current = {
+            "time": all_times[current_idx],
+            "temperature_2m_c": all_temp[current_idx],
+            "precipitation_mm_per_3h": all_precip[current_idx],
+            "wind_speed_mps": all_wind_speed[current_idx],
+            "wind_direction_deg": all_wind_dir[current_idx],
+        }
+
+        forecast_3hourly = {
+            "time": all_times,
+            "temperature_2m_c": all_temp,
+            "precipitation_mm_per_3h": all_precip,
+            "wind_speed_mps": all_wind_speed,
+            "wind_direction_deg": all_wind_dir,
+        }
+
+        result = {
+            "requested": {"latitude": lat, "longitude": lon},
+            "nearest_grid_point": {"latitude": actual_lat, "longitude": actual_lon},
+            "units": {
+                "time": "iso8601",
+                "temperature_2m": "°C",
+                "wind_speed": "m/s",
+                "precipitation": "mm/3h",
+                "wind_direction": "degree"
+            },
+            "current": current,
+            "forecast_3hourly": forecast_3hourly,
+        }
+
+        try:
+            presigned_url = upload_to_s3_and_get_url(result)
+        except ClientError as e:
+            return Response(
+                {"error": f"Failed to upload forecast to S3: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response({"url": presigned_url})
+
+    except Exception as e:
+        logger.exception("15-day forecast data error")
+        return Response(
+            {"error": f"Forecast data not available: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

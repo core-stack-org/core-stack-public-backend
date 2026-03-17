@@ -1,0 +1,96 @@
+{
+  "context": {
+    "version": "2.0.0",
+    "action": "on_select",
+    "domain": "beckn:dataset:ddm:1.0.0",
+    "timestamp": "{{$isoTimestamp}}",
+    "message_id": "{{$guid}}",
+    "transaction_id": "b2bb2763-8342-4c0b-a32a-2bc6a9dab8f2",
+    "bap_id": "ev-charging.sandbox2.com",
+    "bap_uri": "http://onix-bap:8081/bap/receiver",
+    "ttl": "PT30S",
+    "bpp_id": "ev-charging.sandbox2.com",
+    "bpp_uri": "http://onix-bpp:8082/bpp/receiver"
+  },
+  "message": {
+    "order": {
+      "@context": "https://raw.githubusercontent.com/beckn/protocol-specifications-v2/core-v2.0.0-rc/schema/core/v2/context.jsonld",
+      "@type": "beckn:Order",
+      "beckn:orderStatus": "CREATED",
+      "beckn:seller": "climate-data-provider-001",
+      "beckn:buyer": {
+        "@context": "https://raw.githubusercontent.com/beckn/protocol-specifications-v2/core-v2.0.0-rc/schema/core/v2/context.jsonld",
+        "@type": "beckn:Buyer",
+        "beckn:id": "buyer-hydrology-lab-001",
+        "beckn:displayName": "Hydrology Lab, Delhi"
+      },
+      "beckn:orderItems": [
+        {
+          "beckn:lineId": "line-001",
+          "beckn:orderedItem": "ds-rainprob-delhi-ncr-march-2025",
+          "beckn:acceptedOffer": {
+            "@context": "https://raw.githubusercontent.com/beckn/protocol-specifications-v2/core-v2.0.0-rc/schema/core/v2/context.jsonld",
+            "@type": "beckn:Offer",
+            "beckn:id": "offer-rainprob-delhi-2025-03-bulk-download",
+            "beckn:descriptor": {
+              "@type": "beckn:Descriptor",
+              "schema:name": "One-Time Bulk Download — Rainwater Probability Delhi-NCR March 2025"
+            },
+            "beckn:provider": "climate-data-provider-001",
+            "beckn:items": [
+              "ds-rainprob-delhi-ncr-march-2025"
+            ]
+          },
+          "beckn:quantity": {
+            "unitText": "dataset",
+            "unitCode": "EA",
+            "unitQuantity": 1
+          },
+          "beckn:price": {
+            "currency": "INR",
+            "value": 2499.00,
+            "components": [
+              {
+                "type": "UNIT",
+                "value": 2117.80,
+                "currency": "INR",
+                "description": "Rainwater Probability Delhi-NCR March 2025 — Parquet export"
+              },
+              {
+                "type": "TAX",
+                "value": 381.20,
+                "currency": "INR",
+                "description": "GST 18%"
+              }
+            ]
+          }
+        }
+      ],
+      "beckn:orderValue": {
+        "currency": "INR",
+        "value": 2499.00,
+        "components": [
+          {
+            "type": "UNIT",
+            "value": 2117.80,
+            "currency": "INR",
+            "description": "Subtotal"
+          },
+          {
+            "type": "TAX",
+            "value": 381.20,
+            "currency": "INR",
+            "description": "GST 18%"
+          },
+          {
+            "type": "DISCOUNT",
+            "value": 0.00,
+            "currency": "INR",
+            "description": "No discount"
+          }
+        ]
+      }
+    }
+  }
+}
+

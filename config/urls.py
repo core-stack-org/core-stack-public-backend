@@ -18,6 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path("api/v1/weather/", include("weather.urls")),
-    path("api/v1/beckn/", include("beckn.urls")),
-    path("api/v1/advisory/", include("rule_engine.urls")),
+    path("api/v1/advisory", include("rule_engine.urls")),
+    path("", include("beckn.urls")),
 ]
