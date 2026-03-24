@@ -138,12 +138,25 @@ class ConfirmAPI(APIView):
         on_confirm["context"]["message_id"] = message_id
 
         try:
+            # MARK: Extract lat/lon from request payload
+            order_items = request.data.get("message", {}).get("order", {}).get("beckn:orderItems", [])
+            geo = order_items[0].get("beckn:orderItemAttributes", {}).get("schema:spatialCoverage", {}).get("schema:geo", {})
+            lat = geo.get("schema:latitude")
+            lon = geo.get("schema:longitude")
+
+            if not lat or not lon:
+                return Response(
+                    {"error": "lat/lon not found in request payload"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             #* Call forecast download API
             forecast_response = requests.get(
                 f"{LOCAL_URL}/api/v1/weather/download_forecast/",
-                params={"lat": 28.62, "lon": 77.43},
+                params={"lat": lat, "lon": lon},
                 timeout=30
             )
+            
             forecast_data = forecast_response.json()
             access_url = forecast_data.get("url")
 
