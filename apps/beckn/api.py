@@ -71,8 +71,8 @@ class SelectAPI(APIView):
         bap_uri = context.get("bap_uri")
         message_id = context.get("message_id")
 
-        on_select = load_json_template("on_select.json", context)
-        on_select = inject_dynamic_context(on_select)
+        on_select = load_json_template("on_select.json")
+        on_select = inject_dynamic_context(on_select, context)
         on_select["context"]["bap_uri"] = bap_uri
         on_select["context"]["message_id"] = message_id
 
@@ -102,8 +102,8 @@ class InitAPI(APIView):
         bap_uri = context.get("bap_uri")
         message_id = context.get("message_id")
 
-        on_init = load_json_template("on_init.json", context)
-        on_init = inject_dynamic_context(on_init)
+        on_init = load_json_template("on_init.json")
+        on_init = inject_dynamic_context(on_init, context)
         on_init["context"]["bap_uri"] = bap_uri
         on_init["context"]["message_id"] = message_id
 
@@ -131,8 +131,8 @@ class ConfirmAPI(APIView):
         bap_uri = context.get("bap_uri")
         message_id = context.get("message_id")
 
-        on_confirm = load_json_template("on_confirm.json", context)
-        on_confirm = inject_dynamic_context(on_confirm)
+        on_confirm = load_json_template("on_confirm.json")
+        on_confirm = inject_dynamic_context(on_confirm, context)
         on_confirm["context"]["bap_uri"] = bap_uri
         on_confirm["context"]["message_id"] = message_id
 
