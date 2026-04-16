@@ -36,8 +36,12 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.contenttypes",
+    "django.contrib.admin",
     "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
     # Third party
     "rest_framework",
@@ -47,12 +51,18 @@ INSTALLED_APPS = [
     "weather",
     "beckn",
     "rule_engine",
+    "bot_interface",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # MARK: CORS Flag
@@ -138,3 +148,20 @@ X_API_KEY = os.getenv("X_API_KEY")
 GEOSERVER_URL = os.getenv("GEOSERVER_URL")
 BPP_URI = os.getenv("BPP_URI")
 LOCAL_URL = os.getenv("LOCAL_URL")
+
+# MARK: Celery Configuration
+CELERY_TIMEZONE = "Asia/Kolkata"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_RESULT_SERIALIZER = "json"
+
+
+WHATSAPP_MEDIA_PATH = os.getenv("WHATSAPP_MEDIA_PATH")
+AUTH_TOKEN_FB_META = os.getenv("AUTH_TOKEN_FB_META")
+AUTH_TOKEN_360 = os.getenv("AUTH_TOKEN_360")
+ES_AUTH = os.getenv("ES_AUTH")
+CALL_PATCH_API_KEY = os.getenv("CALL_PATCH_API_KEY")
+CE_API_URL = os.getenv("CE_API_URL")
+
+LOCAL_API_URL = os.getenv("LOCAL_API_URL")
+

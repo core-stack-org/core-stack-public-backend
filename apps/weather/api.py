@@ -269,9 +269,18 @@ def get_current_weather(request):
 
 @api_view(["GET"])
 def get_forecast_5day(request):
+    from django.core.cache import cache
     try:
         lat = float(request.GET.get("lat"))
         lon = float(request.GET.get("lon"))
+
+        # Caching: Results from GFS/Xarray are expensive (S3 fetch + compute)
+        # Weather updates every 6 hours, so 1-hour cache is very safe and fast
+        cache_key = f"weather_5day_{round(lat, 2)}_{round(lon, 2)}"
+        cached_res = cache.get(cache_key)
+        if cached_res:
+            logger.info(f"Serving cached 5-day forecast for {cache_key}")
+            return Response(cached_res, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response(
@@ -396,6 +405,8 @@ def get_forecast_5day(request):
             "hourly": hourly,
         }
 
+        # Save to cache for 1 hour
+        cache.set(cache_key, result, timeout=3600)
         return Response(result, status=status.HTTP_200_OK)
 
     except Exception as e:
