@@ -12,7 +12,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - fallback for minimal environments
+    def load_dotenv(*args, **kwargs):
+        return False
 
 
 load_dotenv()
@@ -162,6 +166,11 @@ AUTH_TOKEN_360 = os.getenv("AUTH_TOKEN_360")
 ES_AUTH = os.getenv("ES_AUTH")
 CALL_PATCH_API_KEY = os.getenv("CALL_PATCH_API_KEY")
 CE_API_URL = os.getenv("CE_API_URL")
+WHATSAPP_WEBHOOK_VERIFY_TOKEN = os.getenv("WHATSAPP_WEBHOOK_VERIFY_TOKEN")
+WEBHOOK_DEDUP_TIMEOUT_SECONDS = int(os.getenv("WEBHOOK_DEDUP_TIMEOUT_SECONDS", "3600"))
+WHATSAPP_MEDIA_MAX_UPLOAD_BYTES = int(
+    os.getenv("WHATSAPP_MEDIA_MAX_UPLOAD_BYTES", str(16 * 1024 * 1024))
+)
 
 LOCAL_API_URL = os.getenv("LOCAL_API_URL")
 

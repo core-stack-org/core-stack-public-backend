@@ -22,15 +22,21 @@ import time
 from datetime import datetime, timedelta
 import subprocess
 from requests.exceptions import RequestException
+import mimetypes
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.core.cache import cache
 
 # from pydub import AudioSegment
 # from pydub.utils import which
 
-# Set to track processed message IDs
-processed_message_ids = set()
+WEBHOOK_DEDUP_TIMEOUT_SECONDS = int(
+    getattr(settings, "WEBHOOK_DEDUP_TIMEOUT_SECONDS", 3600)
+)
+MAX_MEDIA_UPLOAD_BYTES = int(
+    getattr(settings, "WHATSAPP_MEDIA_MAX_UPLOAD_BYTES", 16 * 1024 * 1024)
+)
 
 # Define WhatsApp media path
 WHATSAPP_MEDIA_PATH = getattr(settings, "WHATSAPP_MEDIA_PATH", os.path.join(settings.BASE_DIR, "media/whatsapp/"))
@@ -41,6 +47,46 @@ os.makedirs(WHATSAPP_MEDIA_PATH, exist_ok=True)
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _mark_message_if_new(message_id: str) -> bool:
+    """Return True when message ID is first seen within dedupe TTL."""
+    if not message_id:
+        return False
+
+    cache_key = f"wa:webhook:message:{message_id}"
+    # cache.add stores key only if absent, preventing unbounded in-memory set growth.
+    return cache.add(cache_key, True, timeout=WEBHOOK_DEDUP_TIMEOUT_SECONDS)
+
+
+def _safe_extension_from_mime(mime_type: str) -> str:
+    """Resolve deterministic file extension from MIME type."""
+    if not mime_type:
+        return ".bin"
+
+    explicit_map = {
+        "audio/aac": ".aac",
+        "audio/amr": ".amr",
+        "audio/mpeg": ".mp3",
+        "audio/mp4": ".m4a",
+        "audio/ogg": ".ogg",
+        "audio/opus": ".opus",
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "video/mp4": ".mp4",
+    }
+    if mime_type in explicit_map:
+        return explicit_map[mime_type]
+
+    guessed = mimetypes.guess_extension(mime_type, strict=False)
+    if guessed:
+        return guessed
+
+    if "/" in mime_type and mime_type.split("/")[-1]:
+        return f".{mime_type.split('/')[-1].split(';')[0]}"
+    return ".bin"
 
 
 def mark_message_as_read(bot_instance_id, message_id):
@@ -116,7 +162,8 @@ def whatsapp_webhook(request):
             challenge,
         )
 
-        if mode == "subscribe" and verify_token == "Hello Coretsack":
+        expected_verify_token = getattr(settings, "WHATSAPP_WEBHOOK_VERIFY_TOKEN", "")
+        if mode == "subscribe" and verify_token == expected_verify_token:
             # Return challenge as plain text with 200 OK
             return HttpResponse(challenge, content_type="text/plain", status=200)
         else:
@@ -124,7 +171,7 @@ def whatsapp_webhook(request):
                 "Webhook verification failed: mode=%s verify_token=%s expected=%s",
                 mode,
                 verify_token,
-                "Hello Corestack",
+                "***",
             )
             return HttpResponseForbidden("Verification token mismatch")
 
@@ -195,13 +242,12 @@ def whatsapp_webhook(request):
     print("Enrtry json ----------", entry)
     if "messages" in entry[0]["changes"][0]["value"]:
         message_id = entry[0]["changes"][0]["value"]["messages"][0]["id"]
-        if message_id in processed_message_ids:
+        if not _mark_message_if_new(message_id):
             return Response(
                 {"error": "Duplicate message ID"}, status=status.HTTP_200_OK
             )
-        processed_message_ids.add(message_id)
         mark_message_as_read(bot.id, message_id)
-        Response({"success": True}, status=status.HTTP_200_OK)
+        return Response({"success": True}, status=status.HTTP_200_OK)
 
     print("Flating user data")
     event = ""
@@ -969,9 +1015,9 @@ def download_media_from_url(app_instance_config_id, media_response):
         # Construct download URL
         download_url = f"{media_path}"
 
-        # Determine file extension from mime_type
-        mime_type = media_response["mime_type"]
-        extension = mime_type.split("/")[-1]
+        # Determine file extension from MIME type.
+        mime_type = media_response.get("mime_type", "")
+        extension = _safe_extension_from_mime(mime_type).lstrip(".")
         print("media_response :: ", media_response, mime_type)
 
         # Create filepath
@@ -1023,6 +1069,19 @@ def upload_media(bot_instance_id, file_path, media_type="image/png"):
         dict: WhatsApp API response containing 'id' of the uploaded media, or None on failure.
     """
     try:
+        if not os.path.exists(file_path):
+            return {"error": f"File not found: {file_path}"}
+
+        file_size = os.path.getsize(file_path)
+        if file_size > MAX_MEDIA_UPLOAD_BYTES:
+            max_size_mb = round(MAX_MEDIA_UPLOAD_BYTES / (1024 * 1024), 2)
+            return {
+                "error": (
+                    f"File too large ({file_size} bytes). "
+                    f"Maximum allowed size is {max_size_mb} MB."
+                )
+            }
+
         BSP_URL, HEADERS, _ = bot_interface.auth.get_bsp_url_headers(bot_instance_id)
 
         # Build multipart upload headers (no Content-Type, let requests set it)
@@ -1110,6 +1169,20 @@ def upload_media_buffer(bot_instance_id, file_buffer, media_type, filename="imag
     from bot_interface.auth import get_bsp_url_headers
     
     try:
+        current_pos = file_buffer.tell()
+        file_buffer.seek(0, os.SEEK_END)
+        file_size = file_buffer.tell()
+        file_buffer.seek(current_pos)
+
+        if file_size > MAX_MEDIA_UPLOAD_BYTES:
+            max_size_mb = round(MAX_MEDIA_UPLOAD_BYTES / (1024 * 1024), 2)
+            return {
+                "error": (
+                    f"File too large ({file_size} bytes). "
+                    f"Maximum allowed size is {max_size_mb} MB."
+                )
+            }
+
         BSP_URL, HEADERS, _ = get_bsp_url_headers(bot_instance_id)
         
         # Remove Content-Type header for multipart/form-data (requests will set it automatically)
@@ -1184,6 +1257,9 @@ def send_interactive_carousel(bot_instance_id, contact_number, cards, body_text=
             logger.warning(f"Carousel should have 2-10 cards, got {len(cards)}")
             if len(cards) == 1:
                 return send_interactive_message(bot_instance_id, contact_number, cards[0])
+            return {
+                "error": f"Carousel supports 2 to 10 cards, but {len(cards)} were provided."
+            }
         
         formatted_cards = []
         for idx, c in enumerate(cards):
@@ -1282,6 +1358,9 @@ def send_carousel(bot_instance_id, contact_number, cards, body_text="Your foreca
             logger.warning(f"Carousel should have 2-10 cards, got {len(cards)}")
             if len(cards) == 1:
                 return send_interactive_message(bot_instance_id, contact_number, cards[0])
+            return {
+                "error": f"Carousel supports 2 to 10 cards, but {len(cards)} were provided."
+            }
         
         # Format cards according to WhatsApp API specification
         formatted_cards = []

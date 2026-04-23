@@ -102,6 +102,32 @@ def is_user_in_community(bot_user, community_id):
     return False
 
 
+def save_context_id_in_user_misc(phone_number, context_id, bot_instance_id, app_type="WA"):
+    """
+    Persist the last outbound context/message ID for a bot user.
+    Returns True when saved, False when user/session cannot be found.
+    """
+    try:
+        from django.contrib.auth.models import User as AuthUser
+
+        username = f"user_{phone_number}"
+        auth_user = AuthUser.objects.get(username=username)
+        bot_user = bot_interface.models.BotUsers.objects.get(
+            user=auth_user, bot_id=bot_instance_id
+        )
+
+        if not isinstance(bot_user.user_misc, dict):
+            bot_user.user_misc = {}
+
+        bot_user.user_misc.setdefault("context", {})
+        bot_user.user_misc["context"][app_type] = {"last_context_id": context_id}
+        bot_user.save(update_fields=["user_misc"])
+        return True
+    except Exception as exc:
+        logger.warning("Unable to save context ID for %s: %s", phone_number, exc)
+        return False
+
+
 def sync_community_data_from_database(bot_user):
     """
     Sync community data from database to user_misc for existing users.
@@ -434,16 +460,24 @@ def check_event_type(
 
 
 def create_media_entry(user, media_path, media_type, app_type="WA"):
-    # import requests  # Placeholder for external API call
+    """
+    Store media reference in user metadata.
+    This avoids hard dependency on a separate Media model.
+    """
+    if not hasattr(user, "user_misc") or not isinstance(user.user_misc, dict):
+        user.user_misc = {}
 
-    media_details = Media(
-        app_type=app_type,
-        app_instance_config=user.app_instance_config,
-        user=user,
-        media_type=media_type,
-        media_path=media_path,
+    media_entries = user.user_misc.get("media_entries", [])
+    media_entries.append(
+        {
+            "app_type": app_type,
+            "media_type": media_type,
+            "media_path": media_path,
+            "created_at": datetime.utcnow().isoformat(),
+        }
     )
-    media_details.save()
+    user.user_misc["media_entries"] = media_entries[-50:]
+    user.save(update_fields=["user_misc"])
 
 
 def detect_url(text):
@@ -1209,6 +1243,7 @@ def detect_url(text):
 
 def convert_image_hdpi(filepath):
     from bot_interface.api import WHATSAPP_MEDIA_PATH
+    from PIL import Image
 
     image_name = filepath.split("/")[-1]
     image_split = str(image_name).split(".")
@@ -1263,7 +1298,7 @@ def get_filename_extension(file_name):
 
 def get_s3_file_url(file_name):
     folder = "audios" if file_name.split(".")[-1] == "mp3" else "images"
-    return BUCKET_URL + "docs/" + folder + "/" + file_name
+    return CE_BUCKET_URL + "docs/" + folder + "/" + file_name
 
 
 # def flat_df(df):
