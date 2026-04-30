@@ -105,7 +105,7 @@ def crop_rule_engine(request):
 
     # 10 days = 80 intervals of 3hr forecasts
     precip_10_days = precip_list[:80]
-    total_precip_10_days = sum(precip_10_days)
+    total_precip_10_days = sum(v for v in precip_10_days if v is not None)
 
 
     # MARK: Rule Lookup

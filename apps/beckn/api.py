@@ -1,6 +1,5 @@
 import os
 import json
-import uuid
 import threading
 from datetime import datetime, timezone
 
@@ -14,7 +13,10 @@ from django.conf import settings
 
 from .models import Dataset, DatasetOrder
 from .services import generate_download_token
+from .tasks import beckn_onix_call
 
+BPP_URI = "http://api.core-stack.org:8082"
+LOCAL_URL = "http://api.core-stack.org:8000"
 S3_BUCKET = "corestack-weather-data"
 TEMPLATES_DIR = os.path.join(
     settings.BASE_DIR,
@@ -26,15 +28,14 @@ TEMPLATES_DIR = os.path.join(
 
 def load_json_template(filename: str) -> dict:
     filepath = os.path.join(TEMPLATES_DIR, filename)
-    with open(filepath) as f:
+    with open(filepath, encoding="utf-8") as f:
         return json.load(f)
 
 
-def inject_dynamic_context(data: dict) -> dict:
+def inject_dynamic_context(data: dict, context: dict) -> dict:
     iso_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
+    data["context"] = context
     data["context"]["timestamp"] = iso_timestamp
-
     return data
 
 
@@ -71,15 +72,16 @@ class SelectAPI(APIView):
         message_id = context.get("message_id")
 
         on_select = load_json_template("on_select.json")
-        on_select = inject_dynamic_context(on_select)
+        on_select = inject_dynamic_context(on_select, context)
         on_select["context"]["bap_uri"] = bap_uri
         on_select["context"]["message_id"] = message_id
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_select", on_select),
-            daemon=True
-        ).start()
+        print("Reached here Before The Celery")
+
+        beckn_onix_call.apply_async(
+            args=[f"{BPP_URI}/bpp/caller/on_select", on_select],
+            queue='beckn'
+        )
 
         return Response({
             "context": context,
@@ -101,15 +103,14 @@ class InitAPI(APIView):
         message_id = context.get("message_id")
 
         on_init = load_json_template("on_init.json")
-        on_init = inject_dynamic_context(on_init)
+        on_init = inject_dynamic_context(on_init, context)
         on_init["context"]["bap_uri"] = bap_uri
         on_init["context"]["message_id"] = message_id
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_init", on_init),
-            daemon=True
-        ).start()
+        beckn_onix_call.apply_async(
+            args=[f"{BPP_URI}/bpp/caller/on_init", on_init],
+            queue='beckn'
+        )
 
         return Response({
             "context": context,
@@ -131,17 +132,30 @@ class ConfirmAPI(APIView):
         message_id = context.get("message_id")
 
         on_confirm = load_json_template("on_confirm.json")
-        on_confirm = inject_dynamic_context(on_confirm)
+        on_confirm = inject_dynamic_context(on_confirm, context)
         on_confirm["context"]["bap_uri"] = bap_uri
         on_confirm["context"]["message_id"] = message_id
 
         try:
+            # MARK: Extract lat/lon from request payload
+            order_items = request.data.get("message", {}).get("order", {}).get("beckn:orderItems", [])
+            geo = order_items[0].get("beckn:orderItemAttributes", {}).get("schema:spatialCoverage", {}).get("schema:geo", {})
+            lat = geo.get("schema:latitude")
+            lon = geo.get("schema:longitude")
+
+            if not lat or not lon:
+                return Response(
+                    {"error": "lat/lon not found in request payload"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             #* Call forecast download API
             forecast_response = requests.get(
-                f"{settings.LOCAL_URL}/api/v1/weather/download_forecast/",
-                params={"lat": 28.62, "lon": 77.43},
+                f"{LOCAL_URL}/api/v1/weather/download_forecast/",
+                params={"lat": lat, "lon": lon},
                 timeout=30
             )
+            
             forecast_data = forecast_response.json()
             access_url = forecast_data.get("url")
 
@@ -176,12 +190,10 @@ class ConfirmAPI(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        threading.Thread(
-            target=fire_callback,
-            args=(f"{settings.BPP_URI}/bpp/caller/on_confirm", on_confirm),
-            daemon=True
-        ).start()
-
+        beckn_onix_call.apply_async(
+            args=[f"{BPP_URI}/bpp/caller/on_confirm", on_confirm],
+            queue='beckn'
+        )
         return Response({
             "context": context,
             "message": {

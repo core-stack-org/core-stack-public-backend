@@ -40,3 +40,8 @@ GEOSERVER_URL = "https://geoserver.core-stack.org:8443/geoserver"
 BPP_URI = ""
 LOCAL_URL = ""
 ```
+
+### TODO's
+
+- Need to update the environment variables handling
+- Need to daemonise the Celery
