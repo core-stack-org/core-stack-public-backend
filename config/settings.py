@@ -34,23 +34,39 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
-INSTALLED_APPS = [
-    "django.contrib.contenttypes",
-    "django.contrib.auth",
-
-    # Third party
-    "rest_framework",
-    "corsheaders",
-
-    # Local apps
-    "weather",
-    "beckn",
-    "rule_engine",
+CSRF_TRUSTED_ORIGINS = [
+    "https://onix.core-stack.org",
 ]
 
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',      # ADD THIS LINE
+    'django.contrib.messages',
+    'django.contrib.staticfiles',   # Consider adding this too
+    'rest_framework',
+    'corsheaders',
+    'weather',
+    'beckn',
+    'rule_engine',
+    'bot_interface',
+]
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/cfpt/core-stack-public-backend/static/'
+
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Required
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # THIS IS MISSING
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
 ]
@@ -138,3 +154,18 @@ X_API_KEY = os.getenv("X_API_KEY")
 GEOSERVER_URL = os.getenv("GEOSERVER_URL")
 BPP_URI = os.getenv("BPP_URI")
 LOCAL_URL = os.getenv("LOCAL_URL")
+
+
+WHATSAPP_MEDIA_PATH = os.getenv("WHATSAPP_MEDIA_PATH")
+AUTH_TOKEN_FB_META = os.getenv("AUTH_TOKEN_FB_META")
+AUTH_TOKEN_360 = os.getenv("AUTH_TOKEN_360")
+ES_AUTH = os.getenv("ES_AUTH")
+CALL_PATCH_API_KEY = os.getenv("CALL_PATCH_API_KEY")
+CE_API_URL = os.getenv("CE_API_URL")
+WHATSAPP_WEBHOOK_VERIFY_TOKEN = os.getenv("WHATSAPP_WEBHOOK_VERIFY_TOKEN")
+WEBHOOK_DEDUP_TIMEOUT_SECONDS = int(os.getenv("WEBHOOK_DEDUP_TIMEOUT_SECONDS", "3600"))
+WHATSAPP_MEDIA_MAX_UPLOAD_BYTES = int(
+    os.getenv("WHATSAPP_MEDIA_MAX_UPLOAD_BYTES", str(16 * 1024 * 1024))
+)
+
+LOCAL_API_URL = os.getenv("LOCAL_API_URL")
