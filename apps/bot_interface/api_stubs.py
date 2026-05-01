@@ -1,26 +1,106 @@
 
 import random
+import requests
+from django.conf import settings
+import math
+from datetime import datetime, timedelta
+from config.settings import GEOSERVER_URL, PRODUCTION_API_SERVER_URL
+import numpy as np
+from django.db.models import Q
+from scipy.spatial import cKDTree
+from rest_framework.response import Response
+from rest_framework import status
+
+
+def get_location_based_plan_properties(lon, lat):
+    base_url = "https://geoserver.core-stack.org:8443/geoserver/wfs"
+    layer_name = "pan_india_asset:plans_plan"
+
+    RADIUS_METERS = 1500  # 11km radius
+
+    cql_filter = f"DWITHIN(geom, POINT({lon} {lat}), {RADIUS_METERS}, meters)"
+
+    params = {
+        "service": "WFS",
+        "version": "2.0.0",
+        "request": "GetFeature",
+        "typeName": layer_name,
+        "outputFormat": "application/json",
+        "CQL_FILTER": cql_filter,
+    }
+
+    try:
+        r = requests.get(base_url, params=params)
+        r.raise_for_status()
+
+        features = r.json().get("features", [])
+
+        if not features:
+            return Response([], status=status.HTTP_200_OK)
+
+        coords, valid_features = [], []
+        for f in features:
+            geometry = f.get("geometry")
+            if not geometry:
+                continue
+            point_lon, point_lat = geometry["coordinates"]
+            coords.append([point_lat, point_lon])
+            valid_features.append(f)
+
+        if not coords:
+            return Response([], status=status.HTTP_200_OK)
+
+        coords_np = np.array(coords)
+        tree = cKDTree(coords_np)
+
+        k = min(5, len(coords_np))
+        _, indices = tree.query([lat, lon], k=k)
+
+        if k == 1:
+            indices = [indices]
+
+        result = [valid_features[i]["properties"] for i in indices]
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print("Error:", str(e))
+        return Response({"error": "Failed to fetch nearest plans"}, status=500)
+
 
 def get_villages_by_location(lat, lon):
-    """Fetch nearest 5 villages from API based on location."""
-    import requests
-    url = "https://geoserver.core-stack.org/api/v1/get_plan_by_lat_lon/"
+    """Fetch nearest 5 villages from API, fallback to GeoServer if API fails."""
+    url = f"{PRODUCTION_API_SERVER_URL}/api/v1/get_plan_by_lat_lon/"
     params = {"latitude": lat, "longitude": lon}
-    
+
     try:
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
-        # Transform API response to keep all plan data but ensure id and name exist
-        return [{**v, "id": v.get("id"), "name": v.get("village_na")} for v in data[:5]]
+
+        return [
+            {**v, "id": v.get("id"), "name": v.get("village_na")}
+            for v in data[:5]
+        ]
+
     except Exception as e:
-        print(f"DEBUG: get_villages_by_location API call failed: {e}")
-        return []
+        print(f"DEBUG: Primary API failed, switching to fallback: {e}")
+
+        try:
+            fallback_response = get_location_based_plan_properties(lon, lat)
+            fallback_data = getattr(fallback_response, "data", [])
+
+            return [
+                {**v, "id": v.get("id"), "name": v.get("village_na")}
+                for v in fallback_data[:5]
+            ]
+
+        except Exception as fallback_error:
+            print(f"DEBUG: Fallback also failed: {fallback_error}")
+            return []
 
 def check_user_village(phone):
     """Check if user exists in a community via API."""
-    import requests
-    url = "https://geoserver.core-stack.org/api/v1/is_user_in_community/"
+    url = f"{PRODUCTION_API_SERVER_URL}/api/v1/is_user_in_community/"
     # Form data request as seen in Postman screenshot
     data = {"number": phone}
     
@@ -81,10 +161,6 @@ def create_story(user_id, village_id):
 
 def get_weather_forecast(lat, lon, days=5):
     """Call weather API for forecast data."""
-    import requests
-    import math
-    import random
-    from datetime import datetime, timedelta
     
     # User provided API URL
     url = "https://onix.core-stack.org/api/v1/weather/forecast/5-day/"
