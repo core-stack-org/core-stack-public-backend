@@ -1921,6 +1921,8 @@ def callFunctionByName(funct_name, app_type, data_dict):
         event = whatsappInterface.handle_view_stories(bot_instance_id=bot_id, data_dict=data_dict)
     elif funct_name == "set_language":
         event = whatsappInterface.set_language(bot_instance_id=bot_id, data_dict=data_dict)
+    elif funct_name == "check_language_pref":
+        event = whatsappInterface.check_language_pref(bot_instance_id=bot_id, data_dict=data_dict)
     elif funct_name == "jump_to_smj":
         event = whatsappInterface.jump_to_smj(bot_instance_id=bot_id, data_dict=data_dict)
     return event
