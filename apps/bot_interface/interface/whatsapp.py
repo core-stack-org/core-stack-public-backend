@@ -4055,13 +4055,37 @@ class WhatsAppInterface(bot_interface.interface.generic.GenericInterface):
             return "failure"
 
 
+    def check_language_pref(self, bot_instance_id, data_dict):
+        """Check if user has a persistent language preference."""
+        try:
+            user_id = data_dict.get("user_id")
+            user_session = self._load_user_session(bot_instance_id, user_id)
+            bot_user = user_session.user
+            
+            lang = (bot_user.user_misc or {}).get("language")
+            if lang:
+                if not isinstance(user_session.user_config, dict):
+                    user_session.user_config = {}
+                user_session.user_config["language"] = lang
+                user_session.save()
+                print(f"DEBUG: Found persistent language {lang} for user {user_id}")
+                return "success"
+            
+            print(f"DEBUG: No persistent language found for user {user_id}")
+            return "failure"
+        except Exception as e:
+            print(f"Error in check_language_pref: {e}")
+            return "failure"
+
+
     def jump_to_smj(self, bot_instance_id, data_dict):
         """Handle jumping to a target SMJ by name."""
         from bot_interface.models import SMJ
         import json
         
         target_smj_name = data_dict.get("data", {}).get("target_smj")
-        print(f"DEBUG: jump_to_smj called with target: {target_smj_name}")
+        target_init_state = data_dict.get("data", {}).get("init_state")
+        print(f"DEBUG: jump_to_smj called with target: {target_smj_name}, init_state: {target_init_state}")
         
         if not target_smj_name:
             return "failure"
@@ -4072,11 +4096,14 @@ class WhatsAppInterface(bot_interface.interface.generic.GenericInterface):
             if isinstance(smj_states, str):
                 smj_states = json.loads(smj_states)
                 
+            if not target_init_state and smj_states:
+                target_init_state = smj_states[0]['name']
+                
             data_dict["_smj_jump"] = {
                 "smj_id": smj_instance.id,
                 "smj_name": smj_instance.name,
                 "states": smj_states,
-                "init_state": smj_states[0]['name']
+                "init_state": target_init_state
             }
             return "success"
         except Exception as e:
